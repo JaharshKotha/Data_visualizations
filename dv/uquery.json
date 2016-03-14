@@ -1,0 +1,54 @@
+{
+ "name": "flare",
+ "children": [
+  {
+   "name": "KS",
+   "children": [
+	  {"name": "Knowledge Seeking", "size": 2050}, 
+      {"name": "Can", "size": 50},
+      {"name": "Do", "size": 60},
+      {"name": "How", "size": 300},
+      {"name": "Java", "size": 1070},
+	  {"name": "What", "size": 150},
+	  {"name": "Why", "size": 20},
+	  {"name": "Parse", "size": 60},
+	  {"name": "in", "size": 50},
+	  {"name": "print", "size": 50},
+	  {"name": "Random Words", "size": 1160}
+     ]
+    },
+  {
+	  "name":"ML",
+	  "children":[
+		  {"name":"Method Learning", "size":920},
+		  {"name":"Array", "size":110},
+		  {"name":"How", "size":130},
+		  {"name":"Java", "size":200},
+		  {"name": "mutate", "size": 30},
+		  {"name": "sort", "size": 40},
+		  {"name":"Random Words", "size":480}
+		  
+	  ]
+  	
+  },
+  
+ {
+ 	"name":"Problem Solving",
+	"children":[
+         {"name":"Problem Solving", "size":900},
+	 {"name":"Get", "size":30},
+	 {"name":"Call", "size":70},
+	 {"name":"Compute", "size":10},
+	 {"name":"How", "size":110},
+	 {"name":"String", "size":80},
+	  {"name":"What", "size":30},
+	   {"name":"Random Words", "size":650}
+	 
+		
+	] 
+ }
+    
+    
+   ]
+  }
+  

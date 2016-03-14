@@ -1,0 +1,544 @@
+<!-- Social Visualization for Class_Query.csv -->
+
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+p{
+font-size: 12px;
+padding:2px 5px 0px 11px;
+}
+
+body {
+  font: 10px sans-serif;
+}
+.h1{
+font-size:60px;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.bar {
+  fill: orange;
+}
+
+.bar:hover {
+  fill: orangered ;
+}
+
+.x.axis path {
+  display: none;
+}
+
+.d3-tip {
+  line-height: 1;
+  font-weight: bold;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border-radius: 2px;
+
+.d3-tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.8);
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
+}
+
+.d3-tip.n:after {
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+}
+</style>
+<script src="d3.min.js"></script>
+<script src="d3.js"></script>
+<body>
+<div class="heading">
+<h7 style="font-size:30px"><strong>Social Visualization 2</strong></h7>
+<h1 style="font-size:12px">Explanation :</h1>
+<p>The below visualization is a bar-chart comparison of all the different domains of queries based on the number hits from the users.The log from Class-Query.csv was sorted and filtered in excel according to the intention of the user and was fed input to the bar chart.This same input is again sorted and seggragted according to user_id to provide an input to the interactive radial chart.We give a social comparison between the queries of a single user and the entire corpus to predict some interesting patterens listed.</p>
+<h1 style="font-size:12px"><mark><br>Findings & Analysis:</mark></h1><br>
+<ul>
+<li> Based on the frequency of number of hits; most of the students utilize as a forum for knowledge seeking than utilizing it for problem solving or method seeking.We can cache the most frequently used words from Knowledge 
+Seeking to increase the productivity of the time to load by the system
+<li> There are more students who use it for Problem Solving than Method Learning; and mostly using specific questions beginning with key words HOW,WHAT,CAN in increasing order at Problem Solving and HOW,CAN,WHAT in Method Learning; WHAT,HOW,CAN,WHY in Knoowledge seekin.This can help us segragate the fact that <br>A Question beginning with 
+<br>WHAT - could most probably be in Knowledge Seeking domain. 
+<br>HOW - could most probably be in Method Learning domain.
+<br>CAN - could most probably be in Knowledge Seeking domain. 
+<li> A comparision of the user chart to the class , helps us identify individual preference of intention over the class which could be cached for every user login for faster display of results. 
+
+</ul>
+<br><br><p><b style="font-size:12px"><mark>Interactivity :</mark></b><br>(1) Hover the mouse over each of the domain bars to get quick stats of the frequently used words. <br> (2) Drop down list of all the users in the log</p>
+</div>
+
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script>
+//library function to view the interactive hovering offline
+d3.tip = function() {
+  var direction = d3_tip_direction,
+      offset    = d3_tip_offset,
+      html      = d3_tip_html,
+      node      = initNode(),
+      svg       = null,
+      point     = null,
+      target    = null
+
+  function tip(vis) {
+    svg = getSVGNode(vis)
+    point = svg.createSVGPoint()
+    document.body.appendChild(node)
+  }
+
+  tip.show = function() {
+    var args = Array.prototype.slice.call(arguments)
+    if(args[args.length - 1] instanceof SVGElement) target = args.pop()
+
+    var content = html.apply(this, args),
+        poffset = offset.apply(this, args),
+        dir     = direction.apply(this, args),
+        nodel   = d3.select(node), i = 0,
+        coords
+
+    nodel.html(content)
+      .style({ opacity: 1, 'pointer-events': 'all' })
+
+    while(i--) nodel.classed(directions[i], false)
+    coords = direction_callbacks.get(dir).apply(this)
+    nodel.classed(dir, true).style({
+      top: (coords.top +  poffset[0]) + 'px',
+      left: (coords.left + poffset[1]) + 'px'
+    })
+
+    return tip
+  }
+
+  tip.hide = function() {
+    nodel = d3.select(node)
+    nodel.style({ opacity: 0, 'pointer-events': 'none' })
+    return tip
+  }
+
+  tip.attr = function(n, v) {
+    if (arguments.length < 2 && typeof n === 'string') {
+      return d3.select(node).attr(n)
+    } else {
+      var args =  Array.prototype.slice.call(arguments)
+      d3.selection.prototype.attr.apply(d3.select(node), args)
+    }
+
+    return tip
+  }
+
+  tip.style = function(n, v) {
+    if (arguments.length < 2 && typeof n === 'string') {
+      return d3.select(node).style(n)
+    } else {
+      var args =  Array.prototype.slice.call(arguments)
+      d3.selection.prototype.style.apply(d3.select(node), args)
+    }
+
+    return tip
+  }
+
+  tip.direction = function(v) {
+    if (!arguments.length) return direction
+    direction = v == null ? v : d3.functor(v)
+
+    return tip
+  }
+
+  tip.offset = function(v) {
+    if (!arguments.length) return offset
+    offset = v == null ? v : d3.functor(v)
+
+    return tip
+  }
+
+  tip.html = function(v) {
+    if (!arguments.length) return html
+    html = v == null ? v : d3.functor(v)
+
+    return tip
+  }
+
+  function d3_tip_direction() { return 'n' }
+  function d3_tip_offset() { return [0, 0] }
+  function d3_tip_html() { return ' ' }
+
+  var direction_callbacks = d3.map({
+    n:  direction_n,
+    s:  direction_s,
+    e:  direction_e,
+    w:  direction_w,
+    nw: direction_nw,
+    ne: direction_ne,
+    sw: direction_sw,
+    se: direction_se
+  }),
+
+  directions = direction_callbacks.keys()
+
+  function direction_n() {
+    var bbox = getScreenBBox()
+    return {
+      top:  bbox.n.y - node.offsetHeight,
+      left: bbox.n.x - node.offsetWidth / 2
+    }
+  }
+
+  function direction_s() {
+    var bbox = getScreenBBox()
+    return {
+      top:  bbox.s.y,
+      left: bbox.s.x - node.offsetWidth / 2
+    }
+  }
+
+  function direction_e() {
+    var bbox = getScreenBBox()
+    return {
+      top:  bbox.e.y - node.offsetHeight / 2,
+      left: bbox.e.x
+    }
+  }
+
+  function direction_w() {
+    var bbox = getScreenBBox()
+    return {
+      top:  bbox.w.y - node.offsetHeight / 2,
+      left: bbox.w.x - node.offsetWidth
+    }
+  }
+
+  function direction_nw() {
+    var bbox = getScreenBBox()
+    return {
+      top:  bbox.nw.y - node.offsetHeight,
+      left: bbox.nw.x - node.offsetWidth
+    }
+  }
+
+  function direction_ne() {
+    var bbox = getScreenBBox()
+    return {
+      top:  bbox.ne.y - node.offsetHeight,
+      left: bbox.ne.x
+    }
+  }
+
+  function direction_sw() {
+    var bbox = getScreenBBox()
+    return {
+      top:  bbox.sw.y,
+      left: bbox.sw.x - node.offsetWidth
+    }
+  }
+
+  function direction_se() {
+    var bbox = getScreenBBox()
+    return {
+      top:  bbox.se.y,
+      left: bbox.e.x
+    }
+  }
+
+  function initNode() {
+    var node = d3.select(document.createElement('div'))
+    node.style({
+      position: 'absolute',
+      opacity: 0,
+      pointerEvents: 'none',
+      boxSizing: 'border-box'
+    })
+
+    return node.node()
+  }
+
+  function getSVGNode(el) {
+    el = el.node()
+    if(el.tagName.toLowerCase() == 'svg')
+      return el
+
+    return el.ownerSVGElement
+  }
+
+  function getScreenBBox() {
+    var targetel   = target || d3.event.target,
+        bbox       = {},
+        matrix     = targetel.getScreenCTM(),
+        tbbox      = targetel.getBBox(),
+        width      = tbbox.width,
+        height     = tbbox.height,
+        x          = tbbox.x,
+        y          = tbbox.y,
+        scrollTop  = document.documentElement.scrollTop || document.body.scrollTop,
+        scrollLeft = document.documentElement.scrollLeft || document.body.scrollLeft
+
+
+    point.x = x + scrollLeft
+    point.y = y + scrollTop
+    bbox.nw = point.matrixTransform(matrix)
+    point.x += width
+    bbox.ne = point.matrixTransform(matrix)
+    point.y += height
+    bbox.se = point.matrixTransform(matrix)
+    point.x -= width
+    bbox.sw = point.matrixTransform(matrix)
+    point.y -= height / 2
+    bbox.w  = point.matrixTransform(matrix)
+    point.x += width
+    bbox.e = point.matrixTransform(matrix)
+    point.x -= width / 2
+    point.y -= height / 2
+    bbox.n = point.matrixTransform(matrix)
+    point.y += height
+    bbox.s = point.matrixTransform(matrix)
+
+    return bbox
+  }
+
+  return tip
+};
+</script>
+<script>
+
+var margin = {top: 140, right: 20, bottom: 40, left: 40},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+    xht=height + 10;
+
+
+
+var x = d3.scale.ordinal()
+    .rangeRoundBands([0, width], .1);
+
+var y = d3.scale.linear()
+    .range([height, 0]);
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom");
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left");
+    
+
+var tip = d3.tip()
+  .attr('class', 'd3-tip')
+  .offset([-10, 0])
+  .html(function(d) {
+    return "<strong>How(%):</strong> <span style='color:red'>" + d.how + "</span> <br> <strong>What(%):</strong> <span style='color:red'>" + d.what + "</span> <br> <strong>Can(%):</strong> <span style='color:red'>" + d.can + "</span> <br> <strong>Why(%):</strong> <span style='color:red'>" + d.why + "</span> <br> <strong>Others(%):</strong> <span style='color:red'>" + d.others + "</span>";
+  })
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(40,130)");
+
+svg.call(tip);
+
+d3.csv("r.csv", type, function(error, data) {
+  x.domain(data.map(function(d) { return d.letter; }));
+  y.domain([0, d3.max(data, function(d) { return d.frequency; })]);
+
+  svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + xht + ")")
+      .call(xAxis);
+
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("No.of.hits by all users");
+
+   svg.append("text")
+      .attr("class","keys")
+      .attr("transform", "rotate(0)")
+      .attr("x", 700)
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Keys : {KS: knowledge seeking, PS: problem solving,ML: method learning, NA: others}");
+
+  svg.selectAll(".bar")
+      .data(data)
+    .enter().append("rect")
+      .attr("class", "bar")
+      .attr("x", function(d) { return x(d.letter); })
+      .attr("width", x.rangeBand())
+      .attr("y", function(d) { return y(d.frequency); })
+      .attr("height", function(d) { return height - y(d.frequency); })
+      .on('mouseover', tip.show)
+      .on('mouseout', tip.hide)
+
+});
+
+function type(d) {
+  d.frequency = +d.frequency;
+  return d;
+}
+
+</script>
+<svg width="4000" height="65">
+<rect width="10" height="10" x="800" y="5" style="fill:red;stroke-width:1;stroke:rgb(0,0,0)" />
+<text x="822" y="15">KnowledgeSeeking </text>
+<rect width="10" height="10" x="800" y="20" style="fill:green;stroke-width:1;stroke:rgb(0,0,0)" />
+<text x="822" y="30">Method Learning </text>
+<rect width="10" height="10" x="800" y="34" style="fill:blue;stroke-width:1;stroke:rgb(0,0,0)" />
+<text x="822" y="45">Problem Solving </text>
+<rect width="10" height="10" x="800" y="49" style="fill:yellow;stroke-width:1;stroke:rgb(0,0,0)" />
+<text x="822" y="60">Others</text>
+
+</svg>
+<script>
+
+var dispatch = d3.dispatch("load", "statechange");
+
+var groups = [
+  "ks",
+  "ml",
+  "ps",
+  "na"
+];
+
+d3.csv("queruid.csv", type, function(error, states) {
+  if (error) throw error;
+  var qId = d3.map();
+  states.forEach(function(d) { qId.set(d.uid, d); });
+  dispatch.load(qId);
+  dispatch.statechange(qId.get("A0001"));
+});
+
+//Provide interactivity 
+dispatch.on("load.menu", function(qId) {
+  var select = d3.select("body")
+    .append("div")
+    .append("select")
+      .on("change", function() { dispatch.statechange(qId.get(this.value)); });
+
+  select.selectAll("option")
+      .data(qId.values())
+    .enter().append("option")
+      .attr("value", function(d) { return d.uid; })
+      .text(function(d) { return d.uid; });
+
+  dispatch.on("statechange.menu", function(state) {
+    select.property("value", state.uid);
+  });
+});
+
+// A bar chart to show frequency of No.of hits from a user.
+dispatch.on("load.bar", function(qId) {
+  var margin = {top: 20, right: 20, bottom: 30, left: 40},
+      width = 80 - margin.left - margin.right,
+      height = 460 - margin.top - margin.bottom;
+
+  var y = d3.scale.linear()
+      .domain([0, d3.max(qId.values(), function(d) { return d.total; })])
+      .rangeRound([height, 0])
+      .nice();
+
+  var yAxis = d3.svg.axis()
+      .scale(y)
+      .orient("left")
+      .tickFormat(d3.format(".2s"));
+
+  var svg = d3.select("body").append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+      .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("No.of.hits by this user");
+
+  var rect = svg.append("rect")
+      .attr("x", 4)
+      .attr("width", width - 4)
+      .attr("y", height)
+      .attr("height", 0)
+      .style("fill", "#aaa");
+
+  dispatch.on("statechange.bar", function(d) {
+    rect.transition()
+        .attr("y", y(d.total))
+        .attr("height", y(0) - y(d.total));
+  });
+});
+
+// A pie chart to show the freuency of query domain.
+dispatch.on("load.pie", function(qId) {
+  var width = 880,
+      height = 460,
+      radius = Math.min(width, height) / 2;
+
+  var color = d3.scale.ordinal()
+      .domain(groups)
+      .range(["red", "green", "blue", "yellow"]);
+
+  var arc = d3.svg.arc()
+      .outerRadius(radius - 10)
+      .innerRadius(radius - 70);
+
+  var pie = d3.layout.pie()
+      .sort(null);
+
+  var svg = d3.select("body").append("svg")
+      .attr("width", width)
+      .attr("height", height)
+    .append("g")
+      .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+  var path = svg.selectAll("path")
+      .data(groups)
+    .enter().append("path")
+      .style("fill", color)
+      .each(function() { this._current = {startAngle: 0, endAngle: 0}; });
+       
+svg.append("rect").attr("x","470").attr("y","20").attr("width","10").attr("height","10").attr("style","fill:red");
+
+
+
+  dispatch.on("statechange.pie", function(d) {
+    path.data(pie.value(function(g) { return d[g]; })(groups)).transition()
+        .attrTween("d", function(d) {
+          var interpolate = d3.interpolate(this._current, d);
+          this._current = interpolate(0);
+          return function(t) {
+            return arc(interpolate(t));
+          };
+        });
+  });
+});
+
+//Change string to number and calculate sum 
+function type(d) {
+  d.total = d3.sum(groups, function(k) { return d[k] = +d[k]; });
+  return d;
+}
+</script>
+

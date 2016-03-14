@@ -1,0 +1,350 @@
+<!-- Social Visualization for Class_Query.csv -->
+
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+p{
+font-size: 12px;
+padding:2px 5px 0px 11px;
+}
+
+body {
+  font: 10px sans-serif;
+}
+.h1{
+font-size:60px;
+}
+
+circle {
+  fill: #57997B;
+  fill-opacity: .25;
+  stroke: rgb(31, 119, 180);
+  stroke-width: 1px;
+}
+
+.leaf circle {
+  fill: #5D80FE;
+  fill-opacity: 1;
+}
+
+text {
+  font: 10px sans-serif;
+}
+
+.d3-tip {
+  line-height: 1;
+  font-weight: bold;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border-radius: 2px;
+
+.d3-tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.8);
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
+}
+
+.d3-tip.n:after {
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+}
+</style>
+<body>
+
+<div class="heading">
+
+<h7 style="font-size:30px"><strong>Social Visualization 3</strong></h7>
+<h1 style="font-size:12px">Explanation :</h1>
+<p>The below visualization is a packed structure of circles with the most frequent words with a radius proportional to their frequency in that domain. It clearly depicts the clusters based on the intention circle with the biggest radius. The Class_Query log file has been sorted according to the frequency of the most used word grouped by domain intention and has been represented manually into the uquery.json file.</p>
+<h1 style="font-size:12px"><mark><br>Findings & Analysis:</mark></h1>
+<p>The results for this social visualization has been put in the SV2 page.</p>
+<br><br><p><b style="font-size:12px"><mark>Interactivity :</mark></b><br>(3) Hover the mouse over each of the circle to get its radius which is the frequency of the word in that intention domain.<br><br>.</p> 
+</div>
+<script src="//d3js.org/d3.v3.min.js"></script>
+<script src="d3.js"></script>
+<script src="d3.min.js"></script>
+<script>
+//library function to view the interactive hovering offline
+d3.tip = function() {
+  var direction = d3_tip_direction,
+      offset    = d3_tip_offset,
+      html      = d3_tip_html,
+      node      = initNode(),
+      svg       = null,
+      point     = null,
+      target    = null
+
+  function tip(vis) {
+    svg = getSVGNode(vis)
+    point = svg.createSVGPoint()
+    document.body.appendChild(node)
+  }
+
+  tip.show = function() {
+    var args = Array.prototype.slice.call(arguments)
+    if(args[args.length - 1] instanceof SVGElement) target = args.pop()
+
+    var content = html.apply(this, args),
+        poffset = offset.apply(this, args),
+        dir     = direction.apply(this, args),
+        nodel   = d3.select(node), i = 0,
+        coords
+
+    nodel.html(content)
+      .style({ opacity: 1, 'pointer-events': 'all' })
+
+    while(i--) nodel.classed(directions[i], false)
+    coords = direction_callbacks.get(dir).apply(this)
+    nodel.classed(dir, true).style({
+      top: (coords.top +  poffset[0]) + 'px',
+      left: (coords.left + poffset[1]) + 'px'
+    })
+
+    return tip
+  }
+
+  tip.hide = function() {
+    nodel = d3.select(node)
+    nodel.style({ opacity: 0, 'pointer-events': 'none' })
+    return tip
+  }
+
+  tip.attr = function(n, v) {
+    if (arguments.length < 2 && typeof n === 'string') {
+      return d3.select(node).attr(n)
+    } else {
+      var args =  Array.prototype.slice.call(arguments)
+      d3.selection.prototype.attr.apply(d3.select(node), args)
+    }
+
+    return tip
+  }
+
+  tip.style = function(n, v) {
+    if (arguments.length < 2 && typeof n === 'string') {
+      return d3.select(node).style(n)
+    } else {
+      var args =  Array.prototype.slice.call(arguments)
+      d3.selection.prototype.style.apply(d3.select(node), args)
+    }
+
+    return tip
+  }
+
+  tip.direction = function(v) {
+    if (!arguments.length) return direction
+    direction = v == null ? v : d3.functor(v)
+
+    return tip
+  }
+
+  tip.offset = function(v) {
+    if (!arguments.length) return offset
+    offset = v == null ? v : d3.functor(v)
+
+    return tip
+  }
+
+  tip.html = function(v) {
+    if (!arguments.length) return html
+    html = v == null ? v : d3.functor(v)
+
+    return tip
+  }
+
+  function d3_tip_direction() { return 'n' }
+  function d3_tip_offset() { return [0, 0] }
+  function d3_tip_html() { return ' ' }
+
+  var direction_callbacks = d3.map({
+    n:  direction_n,
+    s:  direction_s,
+    e:  direction_e,
+    w:  direction_w,
+    nw: direction_nw,
+    ne: direction_ne,
+    sw: direction_sw,
+    se: direction_se
+  }),
+
+  directions = direction_callbacks.keys()
+
+  function direction_n() {
+    var bbox = getScreenBBox()
+    return {
+      top:  bbox.n.y - node.offsetHeight,
+      left: bbox.n.x - node.offsetWidth / 2
+    }
+  }
+
+  function direction_s() {
+    var bbox = getScreenBBox()
+    return {
+      top:  bbox.s.y,
+      left: bbox.s.x - node.offsetWidth / 2
+    }
+  }
+
+  function direction_e() {
+    var bbox = getScreenBBox()
+    return {
+      top:  bbox.e.y - node.offsetHeight / 2,
+      left: bbox.e.x
+    }
+  }
+
+  function direction_w() {
+    var bbox = getScreenBBox()
+    return {
+      top:  bbox.w.y - node.offsetHeight / 2,
+      left: bbox.w.x - node.offsetWidth
+    }
+  }
+
+  function direction_nw() {
+    var bbox = getScreenBBox()
+    return {
+      top:  bbox.nw.y - node.offsetHeight,
+      left: bbox.nw.x - node.offsetWidth
+    }
+  }
+
+  function direction_ne() {
+    var bbox = getScreenBBox()
+    return {
+      top:  bbox.ne.y - node.offsetHeight,
+      left: bbox.ne.x
+    }
+  }
+
+  function direction_sw() {
+    var bbox = getScreenBBox()
+    return {
+      top:  bbox.sw.y,
+      left: bbox.sw.x - node.offsetWidth
+    }
+  }
+
+  function direction_se() {
+    var bbox = getScreenBBox()
+    return {
+      top:  bbox.se.y,
+      left: bbox.e.x
+    }
+  }
+
+  function initNode() {
+    var node = d3.select(document.createElement('div'))
+    node.style({
+      position: 'absolute',
+      opacity: 0,
+      pointerEvents: 'none',
+      boxSizing: 'border-box'
+    })
+
+    return node.node()
+  }
+
+  function getSVGNode(el) {
+    el = el.node()
+    if(el.tagName.toLowerCase() == 'svg')
+      return el
+
+    return el.ownerSVGElement
+  }
+
+  function getScreenBBox() {
+    var targetel   = target || d3.event.target,
+        bbox       = {},
+        matrix     = targetel.getScreenCTM(),
+        tbbox      = targetel.getBBox(),
+        width      = tbbox.width,
+        height     = tbbox.height,
+        x          = tbbox.x,
+        y          = tbbox.y,
+        scrollTop  = document.documentElement.scrollTop || document.body.scrollTop,
+        scrollLeft = document.documentElement.scrollLeft || document.body.scrollLeft
+
+
+    point.x = x + scrollLeft
+    point.y = y + scrollTop
+    bbox.nw = point.matrixTransform(matrix)
+    point.x += width
+    bbox.ne = point.matrixTransform(matrix)
+    point.y += height
+    bbox.se = point.matrixTransform(matrix)
+    point.x -= width
+    bbox.sw = point.matrixTransform(matrix)
+    point.y -= height / 2
+    bbox.w  = point.matrixTransform(matrix)
+    point.x += width
+    bbox.e = point.matrixTransform(matrix)
+    point.x -= width / 2
+    point.y -= height / 2
+    bbox.n = point.matrixTransform(matrix)
+    point.y += height
+    bbox.s = point.matrixTransform(matrix)
+
+    return bbox
+  }
+
+  return tip
+};
+</script>
+
+<script>
+
+var diameter = 860,
+    format = d3.format(",d");
+
+var pack = d3.layout.pack()
+    .size([diameter - 4, diameter - 4])
+    .value(function(d) { return d.size; });
+
+var svg = d3.select("body").append("svg")
+    .attr("width", diameter)
+    .attr("height", diameter)
+  .append("g")
+    .attr("transform", "translate(2,2)");
+var tip = d3.tip()
+  .attr('class', 'd3-tip')
+  .offset([-10, 0])
+  .html(function(d) {
+    return "<strong>Radius:</strong> <span style='color:red'>" + d.size + "</span>";
+  })
+svg.call(tip);
+
+d3.json("uquery.json", function(error, root) {
+  if (error) throw error;
+
+  var node = svg.datum(root).selectAll(".node")
+      .data(pack.nodes)
+    .enter().append("g")
+      .attr("class", function(d) { return d.children ? "node" : "leaf node"; })
+      .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+
+  node.append("title")
+      .text(function(d) { return d.name + (d.children ? "" : ": " + format(d.size)); });
+
+  node.append("circle")
+      .attr("r", function(d) { return d.r; })
+      .on('mouseover', tip.show)
+      .on('mouseout', tip.hide);
+
+  node.filter(function(d) { return !d.children; }).append("text")
+      .attr("dy", ".3em")
+      .style("text-anchor", "middle")
+      .text(function(d) { return d.name.substring(0, d.r / 3); });
+});
+
+d3.select(self.frameElement).style("height", diameter + "px");
+
+</script>

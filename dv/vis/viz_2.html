@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+  <head>
+    <title>Viz 2: User Activity</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <style>
+      body {
+        font: 9px sans-serif;
+        color: #121401;
+      }
+      .axis path, .axis line {
+        fill: none;
+        stroke: #121401;
+        stroke-width: 2px;
+        shape-rendering: crispEdges;
+      }
+
+      .popover{
+        max-width: 150px;
+        font-size: 10px;
+
+    }
+
+     #text-select {
+        float:right;
+      }  
+
+      #all {
+        margin: auto;
+        width: 80%;
+        padding: 10px;
+      }
+
+      .findings {
+        margin: auto;
+        width: 80%;
+        padding: 10px;
+      }
+
+      li {
+        font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;
+        font-size:13px;
+      }
+
+      select{
+        width:220px;
+        border:1px solid #bbb;
+        line-height: 28px;
+        font-size: 13px;
+      }
+
+    </style>
+  </head>
+  <body>
+    <!-- Heading -->
+    <h1 align="center">User activity trend across weeks</h1>
+    <hr>
+    <div id= "all">
+    <!-- Drop Down -->
+    <div ="drop_down">
+        <select id="text-select" onchange="d3_fun();"></select>
+    </div>
+
+    <!-- Line Chart -->
+    <div id ="line_chart" >
+    </div>
+
+    <!-- Collapsible button -->
+  
+    </div>
+      <hr>
+        <div class="findings">
+    <h3>Findings</h3>
+    <ul>
+      <li>There is a steady increase in user activity which peaks in W41(week 41) followed by a sharp dip as indicated by the line chart. The multi-line chart can be used as an indicator of user engagement effectiveness. An increased scroll/click/select activity shows an increase in user engagement</li>
+    </ul>
+
+    <h3>Visualization features</h3>
+    <ul>
+      <li>The multi-line chart gives a trend of user activity(select, click, scroll up and scroll down) over time. W indicates week here</li>
+      <li>The user drop down gives an option to view the trend for every user</li>
+      <li>Mouseover on the plotted points gives a tooltip with the actvity name, the count and the week</li>
+    </ul> 
+
+    <h3>Data used</h3>
+    <ul>
+     <li>The data used is the class_operations file and it has been aggregated to a week level for ease of visualization</li>
+     <li>The data reading, manipulation and aggregation has been done in R programming language. The processed csv file is read by the application</li>
+    </ul>
+  </div>
+
+
+    <script src="lib/d3.js"></script>
+    <script>
+
+    window.onload = function () {
+        var id_selector = document.getElementById("text-select");
+        id_selector.size = "1";
+        var users = ["All users","A0001","A0005","A0008","A0009","A0010","A0011","A0014","A0015","A0018","A0019","A0020","A0021","A0022","A0024","A0025","A0026","A0029","A0030","A0033","A0034","A0037","A0039","A0040","A0041","A0042","A0043","A0044","A0046","A0047","A0048","A0049","A0050","A0052","A0054","A0056","A0057","A0059","A0061","A0064","A0065","A0066","A0067","A0069","A0071","A0073","A0074","A0075","A0077","A0080","A0081","A0082","A0084","A0087","A0088","B0005","B0007","B0009","B0012","B0013","B0018","B0020","B0021","B0024","B0025","B0026"] ;
+
+        var user_1 ;
+        var option_el;
+        for(i in users) {
+            option_el = document.createElement("option");
+            option_el.setAttribute("value",users[i]);
+            if(users[i]=="All users")
+                option_el.setAttribute("selected","selected");
+            option_el.appendChild(document.createTextNode(users[i]));
+            id_selector.appendChild(option_el);
+        }
+
+        d3_fun();
+    }
+
+    var d3_fun = function() {
+      
+      d3.select("svg").remove();
+
+      var margin = {top: 20, right: 55, bottom: 30, left: 40},
+          width  = 1000 - margin.left - margin.right,
+          height = 500  - margin.top  - margin.bottom;
+
+      var x = d3.scale.ordinal()
+          .rangeRoundBands([0, width], .1);
+
+      var y = d3.scale.linear()
+          .rangeRound([height, 0]);
+
+      var xAxis = d3.svg.axis()
+          .scale(x)
+          .orient("bottom");
+
+      var yAxis = d3.svg.axis()
+          .scale(y)
+          .orient("left");
+
+      var line = d3.svg.line()
+          .interpolate("cardinal")
+          .x(function (d) { return x(d.label) + x.rangeBand() / 2; })
+          .y(function (d) { return y(d.value); });
+
+      var color = d3.scale.ordinal()
+          .range(["#001c9c","#101b4d","#475003","#9c8305","#d3c47c"]);
+
+      var svg = d3.select("#line_chart").append("svg")
+          .attr("width",  width  + margin.left + margin.right)
+          .attr("height", height + margin.top  + margin.bottom)
+        .append("g")
+          .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+      var dropdown_sel = document.getElementById("text-select").value;
+      console.log(dropdown_sel);
+
+      d3.csv("data/line_data1.csv", function (error, data) {
+
+        var labelVar = 'wk';
+        var varNames = d3.keys(data[0]).filter(function (key) { return key !== labelVar && key !== 'u_id';});
+        color.domain(varNames);
+        console.log(varNames);
+      
+        var data = data.filter(function (d){
+                return d.u_id==dropdown_sel;
+            });
+        console.log(data);
+        var seriesData = varNames.map(function (name) {
+          return {
+            name: name,
+            values: data.map(function (d) {
+              return {name: name, label: d[labelVar], value: +d[name]};
+            })
+          };
+        });
+        console.log(seriesData);
+
+        x.domain(data.map(function (d) { return d.wk; }));
+        y.domain([
+          d3.min(seriesData, function (c) { 
+            return d3.min(c.values, function (d) { return d.value; });
+          }),
+          d3.max(seriesData, function (c) { 
+            return d3.max(c.values, function (d) { return d.value; });
+          })
+        ]);
+
+        svg.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(xAxis);
+
+        svg.append("g")
+            .attr("class", "y axis")
+            .call(yAxis)
+          .append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 6)
+            .attr("dy", ".71em")
+            .style("text-anchor", "end")
+            .text("Count");
+
+        var series = svg.selectAll(".series")
+            .data(seriesData)
+          .enter().append("g")
+            .attr("class", "series");
+
+        series.append("path")
+          .attr("class", "line")
+          .attr("d", function (d) { return line(d.values); })
+          .style("stroke", function (d) { return color(d.name); })
+          .style("stroke-width", "4px")
+          .style("fill", "none")
+
+        series.selectAll(".point")
+          .data(function (d) { return d.values; })
+          .enter().append("circle")
+           .attr("class", "point")
+           .attr("cx", function (d) { return x(d.label) + x.rangeBand()/2; })
+           .attr("cy", function (d) { return y(d.value); })
+           .attr("r", "5px")
+           .style("fill", function (d) { return color(d.name); })
+           .style("stroke", "grey")
+           .style("stroke-width", "2px")
+           .on("mouseover", function (d) { showPopover.call(this, d); })
+           .on("mouseout",  function (d) { removePopovers(); })
+
+        var legend = svg.selectAll(".legend")
+            .data(varNames.slice().reverse())
+          .enter().append("g")
+            .attr("class", "legend")
+            .attr("transform", function (d, i) { return "translate(55," + (i * 20+ 250) + ")"; });
+
+        legend.append("rect")
+            .attr("x", width - 10)
+            .attr("width", 10)
+            .attr("height", 10)
+            .style("fill", color)
+            .style("stroke", "grey");
+
+        legend.append("text")
+            .attr("x", width - 12)
+            .attr("y", 6)
+            .attr("dy", ".35em")
+            .style("text-anchor", "end")
+            .text(function (d) { return d; });
+
+        function removePopovers () {
+          $('.popover').each(function() {
+            $(this).remove();
+          }); 
+        }
+
+        function showPopover (d) {
+          $(this).popover({
+            title: d.name,
+            placement: 'auto top',
+            container: 'body',
+            trigger: 'manual',
+            html : true,
+            content: function() { 
+              return "Week: " + d.label + 
+                     "<br/>Count: " + d3.format(",")(d.value ? d.value: d.y1 - d.y0); }
+          });
+          $(this).popover('show')
+        }
+      });
+    }
+    </script>
+  </body>
+</html>

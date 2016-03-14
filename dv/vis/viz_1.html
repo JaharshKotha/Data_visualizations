@@ -1,0 +1,101 @@
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> 
+<html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+  <title>Viz 1: Frequent Searches</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <title>vis</title>
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+  <!-- CSS concatenated and minified via ant build script-->
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <!-- end CSS-->
+
+  <script src="js/libs/modernizr-2.0.6.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>  
+  <style type="text/css">
+
+    h1#bubble_cloud_title {
+      visibility: hidden;
+    }
+
+    .findings {
+        margin: auto;
+        width: 80%;
+        padding: 10px;
+      }
+
+      h1{
+        font-size: 36px;
+        margin-top: 20px;
+        margin-bottom: 10px;
+        font-weight: 500;
+        line-height: 1.1;
+        font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+      }
+  </style>
+</head>
+
+<body>
+  <div align="center">
+  	<h1> Frequent Searches</h1>
+  </div>
+ <hr>
+  <div id="container" class="container">
+      <select id="text-select" onchange="change_title();"></select>
+    
+    <header>
+    <h1 id = "bubble_cloud_title">Bubble Cloud</h1>
+    <h2 id = "title_user"></h2>
+    </header>
+    <div id="main" role="main">
+      <div id="vis"></div>
+      
+    </div>
+
+  </div> <!--! end of #container -->
+  <hr>
+  <div class="findings">
+    <h3>Findings</h3>
+    <ul>
+      <li>Array, string, method, arraylist, class are the top used words for an average user as depicted by the bubble cloud visualization. This visualization can be used to understand the areas of user interest for specific users or in general. This data can be used to structure the website and tailor it as per user interest</li>
+    </ul>
+
+    <h3>Visualization features</h3>
+    <ul>
+      <li>The bubble cloud gives the top words(top 30) where the size of the bubble indicates the frequency of use.</li>
+      <li>The user drop down gives an option to select the user to view their bubble cloud.</li>
+    </ul> 
+
+    <h3>Data used</h3>
+    <ul>
+     <li>The words used for bubble cloud visualization have been extracted by parsing the URLs present in the class_operations dataset</li>
+     <li>Top 30 words for every user is used for the visualization</li>
+    </ul>
+  </div>
+
+  <!-- <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script> -->
+  <script>window.jQuery || document.write('<script src="js/libs/jquery-1.7.2.min.js"><\/script>')</script>
+
+
+  <script defer src="js/plugins.js"></script>
+  <script src="js/libs/coffee-script.js"></script>
+  <script src="js/libs/d3.min.js"></script>
+  <script type="text/coffeescript" src="coffee/vis.coffee"></script>
+  <script src="js/dynamic_parts.js"></script>
+  <script type="text/javascript">
+  </script>
+
+ 
+</body>
+</html>
