@@ -1,0 +1,108 @@
+{
+ "name": "Jaharsh",
+ "children": [
+  {
+   "name": "Education",
+   "children": [
+    {
+     "name": "Bachelor of Technology",
+     "children": [
+      {"name": "College: Amrita School of Engineering", "size": 3938},
+      {"name": "Year of Graduation:2010", "size": 3812}
+      
+     ]
+    },
+	{
+		"name" :"Master of Computer Science",
+		"children":[
+			{"name": "College: Arizona State University", "size": 3938},
+      {"name": "Exxpected year of Graduation:2017", "size": 3812}
+		]
+	}
+   ]
+  },
+  {
+  	"name" : "Projects",
+	  "children":[
+	  	
+		  {"name" :"Adaptive Visualizations : https://github.com/JaharshKotha/Adaptiveassignment ",
+			  "size" :3000
+			  },
+		   {"name" :"JRank:https://github.com/JaharshKotha/IRproject",
+			  "size" :3000
+			  },
+		  {"name" :"Dynamic Tracking of Web Activity Accessed by Users",
+			  "size" :3000
+			  },
+		  {"name" :"Personal Health Monitoring System",
+			  "size" :3000
+			  }
+		 
+		  
+			  
+	  ]
+  },
+  {
+  	"name" : "Computer Skills",
+	  "children":[
+	  	
+		  {"name" :"Languages: C, C++, Java, Python ",
+			  "size" :3000
+			  },
+		   {"name" :"Webs:D3.js,php, Python Django, HTML, JavaScript, CSS, JQuery, Ajax ",
+			  "size" :3000
+			  },
+			  {"name" :"API :Apache Lucene ",
+			  "size" :3000
+			  },
+			  {"name" :"Databases: NOSQL ,Mongo DB,MySql . ",
+			  "size" :3000
+			  }
+			  
+	  ]
+  },
+  {
+  	"name" : "Work Experience",
+	  "children":[
+	  	
+		  {"name" :"Cognizant",
+			  "children" :[
+				  {"name": "To : Dec 2015", "size": 3938},
+				  {"name": "Role: Developer", "size": 3938},
+				   {"name": "From : Jan 2014", "size": 3938}
+				  
+				
+				
+			  ]
+			  },
+		   {"name" :"Research Assistant",
+			  "children" :[
+			  	{"name": "To : May 2014", "size": 3938},
+				   {"name": "From : August 2013", "size": 3938}
+			  ]
+			  }
+		  
+			  
+	  ]
+  },
+  {
+  	"name" : "Contact-Details",
+	  "children":[
+	  	
+		  {"name" :"linkedin: https://www.linkedin.com/in/jaharsh-samayan-aa088263",
+			  "size" :3000
+			  },
+		   {"name" :"Phone:408-874-5302",
+			  "size" :3000
+			  },
+		   {"name" : "615 South Hardy Drive, Tempe, Arizona 85281 (USA)",
+			  "size" :30000
+			  }
+			  
+	  ]
+  } 
+ 
+ ]
+
+
+}

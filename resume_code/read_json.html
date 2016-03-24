@@ -1,0 +1,44 @@
+<meta charset="utf-8">
+<html>
+<head>
+<script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="d3.min.js"></script>
+<script src="d3.js"></script>
+</head>
+<body>
+<script>
+
+
+d3.json("samp.csv", function (data){
+console.log(data);
+canvas =d3.select("body").append("svg")
+			.attr("width",500)
+			.attr("height",500)
+			
+		
+
+
+
+		canvas.selectAll("rect")
+			.data(data)
+			.enter()
+			.append("rect")
+			.attr("width", function (d) {return d.age *10 ;})
+			.attr("height",40)
+			.attr("y", function(d,i) { return i*20 ;})
+			.attr("fill","blue");
+			
+
+
+}
+
+
+
+
+)
+</script>
+
+
+</body>
+
+</html>
