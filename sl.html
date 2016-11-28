@@ -1,73 +1,168 @@
-<?php
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "test";
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<html>
 
-// Create connection
-$conn = mysqli_connect($servername, $username, $password, $dbname);
-// Check connection
-if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
+<style>
+svg {
+    background-color: ;
 }
+</style>
+<div id="svg1">
+</div>
+<div id="svg2">
+</div>
 
-$sql = "SELECT * FROM simplelims";
-$result = mysqli_query($conn, $sql);
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.min.js"></script>
+<script>
+function gew(attribute,val)
+{
 
-$data="";
-$nodes ='"nodes":[{"name":"sun", "x": 250,"y": 250},' ;
-$ns=0;
-$xc=200;
-if (mysqli_num_rows($result) > 0) {
-    // output data of each row
-    while($row = mysqli_fetch_assoc($result)) {
-		
-        $data =$data .  '{"name": "' . $row["pname"]. '","x":200 ,"y":' . (250-$row["orbit_radius"]). '},';
-		$ns = $row["satellites"];
-			while($ns>0)
-			{
-				 $data = $data. '{"name": "sat_' . $row["pname"]. $ns.'","x":' .rand(100,200). ',"y":' .(250-$row["orbit_radius"]-$row["sradius"]). '},';
-				$ns-=1;
-			}
+  var matchingElements = [];
+  var allElements = document.getElementsByTagName('*');
+  for (var i = 0, n = allElements.length; i < n; i++)
+  {
+    if (allElements[i].getAttribute(attribute) !== null)
+    {
+      if(allElements[i].getAttribute(attribute) == val)
+	  {
+      matchingElements.push(allElements[i]);
+	  }
     }
+  }
+  return matchingElements;
 }
-$data = substr($data, 0, -1);
-$nodes =$nodes.$data.']' ;
+function myFunction()
+{
+var data;
+d3.json("sl.php",function(error, data) {
+console.log("ins");
+  console.log(data.nodes[1]);
 
-$res = mysqli_query($conn, $sql);
-$links = ',"links":[';
+ var w = window.innerWidth;
+var h = window.innerHeight;
 
-$ls=1;
-$tem=1;
-$dat="";
+ var c10 = d3.scale.category10();
+ var svg = d3.select("#svg1")
+   .append("svg")
+   .attr("width", w/2)
+   .attr("height", h);
 
-if (mysqli_num_rows($res) > 0) {
-    // output data of each row
-    while($row = mysqli_fetch_assoc($res)) {
+ 
+
+ var links = svg.selectAll("link")
+   .data(data.links)
+   .enter()
+   .append("line")
+   .attr("class", "link")
+   .attr("x1", function(l) {
+     var sourceNode = data.nodes.filter(function(d, i) {
+       return i == l.source
+     })[0];
+     d3.select(this).attr("y1", sourceNode.y);
+	 
+     return sourceNode.x
+   })
+   .attr("x2", function(l) {
+     var targetNode = data.nodes.filter(function(d, i) {
+       return i == l.target
+     })[0];
+     d3.select(this).attr("y2", targetNode.y);
+     return targetNode.x
+   })
+   .attr("source_node", function(l) {
+     var sourceNode = data.nodes.filter(function(d, i) {
+       return i == l.source
+     })[0];
+     return sourceNode.name;
+   })
+    .attr("target_node", function(l) {
+     var targetNode = data.nodes.filter(function(d, i) {
+       return i == l.target
+     })[0];
+     return targetNode.name;
+   })
+   .attr("stroke", "black")
+   .attr("stroke-width",  function(d) { 
+     return d.value/150;
+   });
+var c=5;
+ var elem = svg.selectAll("body")
+        .data(data.nodes)
 		
-		$dat=$dat. '{"source":0,"target":'.$ls.'},'; 
-		$ns = $row["satellites"];
-		$tem+=1;
-		while($ns>0)
-		{
-			$dat=$dat. '{"source":'.$ls.',"target":'.$tem.'},'; 
-			$tem+=1;
-			$ns-=1;
-		}
-		$ls=$tem+1;
+		elemEnter = elem.enter()
+        .append("g")
 		
-      
-    }
-
-	
+ var nodes = svg.selectAll("node")
+   .data(data.nodes)
+   .enter()
+   .append("circle")
+   .attr("class", "node")
+   .attr("cx", function(d) {
+   // return (Math.random() * 400);
+	 return d.x;
+	 
+   })
+   .attr("cy", function(d) {
+   //return (Math.random() * 300);
+     return d.y;
+   })
+   .attr("fill-opacity", 0.5)
+   .attr("r", 15)
+   .attr("nname",function(d) {return d.name;} )
+   .attr("fill", function(d, i) {
+     return c10(i);
+   })
+   	.on("mouseover", function(){
+	var sn = gew("source_node",this.getAttribute("nname"));
+	var tn = gew("target_node",this.getAttribute("nname"));
+	var i=0
+	for(i=0;i<sn.length;i++)
+	{
+	sn[i].setAttribute("stroke", "red");
 	}
-$dat = substr($dat, 0, -1);
-$links = $links .$dat.']' ;
-
-$jd = '{'.$nodes.$links.'}';
-echo $jd;
-
-
-
-mysqli_close($conn);
-?>
+	var i=0
+	for(i=0;i<tn.length;i++)
+	{
+	tn[i].setAttribute("stroke", "red");
+	}
+	
+	})
+	.on("mouseout", function(){
+	var sn = gew("source_node",this.getAttribute("nname"));
+	var tn = gew("target_node",this.getAttribute("nname"));
+	var i=0
+	for(i=0;i<sn.length;i++)
+	{
+	sn[i].setAttribute("stroke", "black");
+	}
+	var i=0
+	for(i=0;i<tn.length;i++)
+	{
+	tn[i].setAttribute("stroke", "black");
+	}
+	
+	
+	});
+   
+     elemEnter.append("text")
+        .attr("dx", function(d){return -20})
+        .text(function(d){return d.name})
+		.attr("font-size", "10px")
+		.attr("x",function(d) {return d.x;} )
+		.attr("y",function(d) {return d.y;} )
+		.attr("id",function(d) {return d.name;} );
+		
+	//	#####################################################################################	
+		
+		
+		
+		
+		
+   });
+   
+   
+   
+   
+   }
+   </script>
+   <body onload="myFunction()">
+   </html>
