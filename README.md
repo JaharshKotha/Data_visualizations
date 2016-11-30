@@ -1,1 +1,1 @@
-Some of my data visualizations.
+Some of my data visualizations
